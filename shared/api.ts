@@ -10,3 +10,38 @@
 export interface DemoResponse {
   message: string;
 }
+
+/**
+ * 3D Model type
+ */
+export interface Model {
+  id: string;
+  title: string;
+  description: string;
+  author: string;
+  fileUrl: string;
+  thumbnailUrl: string;
+  createdAt: string;
+  updatedAt: string;
+  tags?: string[];
+}
+
+export interface ModelsResponse {
+  models: Model[];
+}
+
+export interface ModelDetailResponse {
+  model: Model;
+}
+
+export interface UploadModelResponse {
+  success: boolean;
+  modelId: string;
+  message: string;
+}
+
+export interface ModelViewerDataResponse {
+  modelData: string;
+  format: string;
+  size: number;
+}

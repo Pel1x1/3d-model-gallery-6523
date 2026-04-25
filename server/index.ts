@@ -2,6 +2,12 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import {
+  getModels,
+  getModelById,
+  uploadModel,
+  getModelViewerData,
+} from "./routes/models";
 
 export function createServer() {
   const app = express();
@@ -18,6 +24,12 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // 3D Model API routes
+  app.get("/api/models", getModels);
+  app.get("/api/models/:id", getModelById);
+  app.post("/api/models", uploadModel);
+  app.get("/api/models/:id/viewer", getModelViewerData);
 
   return app;
 }
