@@ -1,7 +1,7 @@
 // controllers.ts
 
 import { RequestHandler } from "express";
-import { Model } from "./model"; // Модель из файла model.ts
+import { Model } from "../models/model"; // Модель из файла model.ts
 import { ModelsResponse, ModelDetailResponse, UploadModelResponse, ModelViewerDataResponse } from "@shared/api";
 
 // Получение всех моделей

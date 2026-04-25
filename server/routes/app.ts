@@ -1,7 +1,7 @@
 // app.ts
 
 import express from "express";
-import { connectDB } from "./db";
+import { connectDB } from "../db";
 import { getModels, getModelById, uploadModel, getModelViewerData } from "./controllers";
 
 const app = express();
