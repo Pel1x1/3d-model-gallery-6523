@@ -34,12 +34,6 @@ export default function Index() {
       {/* Hero Section */}
       <section className="mb-20 animate-fade-in">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full mb-6">
-            <Sparkles size={16} className="text-primary" />
-            <span className="text-sm font-medium text-primary">
-              Добро пожаловать в ModelHub
-            </span>
-          </div>
 
           <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground">
             Каталог{" "}
