@@ -24,10 +24,7 @@ export function Layout({ children }: LayoutProps) {
               to="/"
               className="flex items-center gap-2 text-2xl font-bold text-transparent bg-gradient-to-r from-primary to-secondary bg-clip-text hover:scale-105 transition-transform"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">3D</span>
-              </div>
-              ModelHub
+              3D ModelHub
             </Link>
 
             {/* Desktop Navigation */}
@@ -86,48 +83,6 @@ export function Layout({ children }: LayoutProps) {
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-white/40 backdrop-blur-sm mt-20">
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <h3 className="font-semibold text-foreground mb-4">ModelHub</h3>
-              <p className="text-muted-foreground text-sm">
-                Платформа для просмотра и обмена 3D моделями
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">Навигация</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link to="/" className="hover:text-primary transition-colors">
-                    Каталог
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/profile"
-                    className="hover:text-primary transition-colors"
-                  >
-                    Профиль
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">О сайте</h4>
-              <p className="text-muted-foreground text-sm">
-                Создано с помощью React, Vite и Tailwind CSS
-              </p>
-            </div>
-          </div>
-          <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground text-sm">
-            <p>
-              © 2024 ModelHub. Все права защищены.
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
