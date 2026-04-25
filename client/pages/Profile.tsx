@@ -1,16 +1,22 @@
 import { useState } from "react";
 import { Layout } from "@/components/Layout";
-import { Upload, User, Mail, FileUp, Loader } from "lucide-react";
+import { Upload, User, Mail, FileUp, Loader, X } from "lucide-react";
 import { UploadModelResponse } from "@shared/api";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Profile() {
+  const { user } = useAuth();
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    fileUrl: "",
-    thumbnailUrl: "",
     tags: "",
   });
+
+  const [modelFile, setModelFile] = useState<File | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [modelPreview, setModelPreview] = useState<string>("");
+  const [thumbnailPreview, setThumbnailPreview] = useState<string>("");
 
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -26,6 +32,41 @@ export default function Profile() {
     }));
   };
 
+  const handleModelFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setModelFile(file);
+      setModelPreview(file.name);
+    }
+  };
+
+  const handleThumbnailFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setThumbnailFile(file);
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setThumbnailPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeModelFile = () => {
+    setModelFile(null);
+    setModelPreview("");
+  };
+
+  const removeThumbnailFile = () => {
+    setThumbnailFile(null);
+    setThumbnailPreview("");
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
@@ -36,14 +77,24 @@ export default function Profile() {
       return;
     }
 
+    if (!modelFile) {
+      setError("Выберите файл модели");
+      return;
+    }
+
     try {
       setUploading(true);
+
+      // In a real app, you would upload files to a storage service
+      // For now, we'll create object URLs
+      const modelUrl = URL.createObjectURL(modelFile);
+      const thumbnailUrl = thumbnailPreview || "/placeholder.svg";
 
       const payload = {
         title: formData.title,
         description: formData.description,
-        fileUrl: formData.fileUrl || "/models/default.glb",
-        thumbnailUrl: formData.thumbnailUrl || undefined,
+        fileUrl: modelUrl,
+        thumbnailUrl: thumbnailUrl,
         tags: formData.tags
           .split(",")
           .map((tag) => tag.trim())
@@ -69,10 +120,12 @@ export default function Profile() {
         setFormData({
           title: "",
           description: "",
-          fileUrl: "",
-          thumbnailUrl: "",
           tags: "",
         });
+        setModelFile(null);
+        setModelPreview("");
+        setThumbnailFile(null);
+        setThumbnailPreview("");
 
         // Clear success message after 5 seconds
         setTimeout(() => {
@@ -124,42 +177,30 @@ export default function Profile() {
               </h2>
 
               <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-3">
-                    <User className="inline mr-2" size={18} />
-                    Имя пользователя
-                  </label>
-                  <input
-                    type="text"
-                    value="Текущий пользователь"
-                    disabled
-                    className="w-full px-4 py-3 bg-muted rounded-lg border border-border text-foreground opacity-60"
-                  />
+                <div className="bg-primary/5 rounded-lg p-6 border border-primary/10">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                      <User className="text-white" size={24} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Вы вошли как:
+                      </p>
+                      <p className="text-xl font-bold text-foreground mb-1">
+                        {user?.name}
+                      </p>
+                      <p className="text-sm text-muted-foreground flex items-center gap-2">
+                        <Mail size={16} />
+                        {user?.email}
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-3">
-                    <Mail className="inline mr-2" size={18} />
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value="user@example.com"
-                    disabled
-                    className="w-full px-4 py-3 bg-muted rounded-lg border border-border text-foreground opacity-60"
-                  />
-                </div>
-
-                <div className="pt-6 border-t border-border">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Функция аутентификации будет добавлена в будущем обновлении
+                <div className="pt-4 border-t border-border">
+                  <p className="text-sm text-muted-foreground">
+                    Здесь вы можете загружать и управлять своими 3D моделями
                   </p>
-                  <button
-                    disabled
-                    className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold opacity-60 cursor-not-allowed"
-                  >
-                    Сохранить изменения
-                  </button>
                 </div>
               </div>
             </div>
@@ -220,32 +261,89 @@ export default function Profile() {
 
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-3">
-                    URL файла модели
+                    3D Файл модели * (GLB, GLTF, OBJ, FBX)
                   </label>
-                  <input
-                    type="url"
-                    name="fileUrl"
-                    value={formData.fileUrl}
-                    onChange={handleChange}
-                    placeholder="https://example.com/model.glb"
-                    className="w-full px-4 py-3 rounded-lg border border-border bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
-                    disabled={uploading}
-                  />
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept=".glb,.gltf,.obj,.fbx"
+                      onChange={handleModelFileChange}
+                      disabled={uploading}
+                      className="hidden"
+                      id="model-file"
+                    />
+                    {modelFile ? (
+                      <div className="w-full px-4 py-3 rounded-lg border border-primary bg-primary/5 text-foreground flex items-center justify-between">
+                        <span className="text-sm font-medium truncate">
+                          ✓ {modelPreview}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={removeModelFile}
+                          disabled={uploading}
+                          className="text-destructive hover:text-red-600 transition-colors"
+                        >
+                          <X size={20} />
+                        </button>
+                      </div>
+                    ) : (
+                      <label
+                        htmlFor="model-file"
+                        className="w-full px-4 py-3 rounded-lg border-2 border-dashed border-border bg-white text-muted-foreground cursor-pointer hover:border-primary hover:bg-primary/5 transition-all text-center"
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <Upload size={20} />
+                          <span>Кликните для выбора файла</span>
+                        </div>
+                      </label>
+                    )}
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-3">
-                    URL изображения превью
+                    Изображение превью (опционально)
                   </label>
-                  <input
-                    type="url"
-                    name="thumbnailUrl"
-                    value={formData.thumbnailUrl}
-                    onChange={handleChange}
-                    placeholder="https://example.com/preview.jpg"
-                    className="w-full px-4 py-3 rounded-lg border border-border bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
-                    disabled={uploading}
-                  />
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleThumbnailFileChange}
+                      disabled={uploading}
+                      className="hidden"
+                      id="thumbnail-file"
+                    />
+                    {thumbnailPreview ? (
+                      <div className="space-y-3">
+                        <img
+                          src={thumbnailPreview}
+                          alt="Preview"
+                          className="w-full h-40 object-cover rounded-lg border border-border"
+                        />
+                        <button
+                          type="button"
+                          onClick={removeThumbnailFile}
+                          disabled={uploading}
+                          className="w-full py-2 text-destructive hover:text-red-600 transition-colors font-medium"
+                        >
+                          Удалить превью
+                        </button>
+                      </div>
+                    ) : (
+                      <label
+                        htmlFor="thumbnail-file"
+                        className="w-full px-4 py-8 rounded-lg border-2 border-dashed border-border bg-white text-muted-foreground cursor-pointer hover:border-secondary hover:bg-secondary/5 transition-all text-center"
+                      >
+                        <div className="flex flex-col items-center gap-2">
+                          <Upload size={24} />
+                          <span className="font-medium">
+                            Кликните для выбора изображения
+                          </span>
+                          <span className="text-xs">Рекомендуемый размер 500x300px</span>
+                        </div>
+                      </label>
+                    )}
+                  </div>
                 </div>
 
                 <div>

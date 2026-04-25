@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { ModelsResponse, Model } from "@shared/api";
 import { Sparkles, Zap } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Index() {
+  const { isAuthenticated } = useAuth();
   const [models, setModels] = useState<Model[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -52,23 +54,36 @@ export default function Index() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="btn-primary">
+            <a
+              href="#models"
+              className="btn-primary"
+            >
               <Sparkles className="inline mr-2" size={20} />
               Исследовать каталог
-            </button>
-            <Link
-              to="/profile"
-              className="px-6 py-3 rounded-lg border border-border hover:bg-muted transition-all duration-200 font-semibold flex items-center justify-center gap-2"
-            >
-              <Zap size={20} />
-              Загрузить модель
-            </Link>
+            </a>
+            {isAuthenticated ? (
+              <Link
+                to="/profile"
+                className="px-6 py-3 rounded-lg border border-secondary text-secondary hover:bg-secondary/10 transition-all duration-200 font-semibold flex items-center justify-center gap-2"
+              >
+                <Zap size={20} />
+                Загрузить модель
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="px-6 py-3 rounded-lg border border-secondary text-secondary hover:bg-secondary/10 transition-all duration-200 font-semibold flex items-center justify-center gap-2"
+              >
+                <Zap size={20} />
+                Войдите и загружайте
+              </Link>
+            )}
           </div>
         </div>
       </section>
 
       {/* Models Grid */}
-      <section className="mb-20">
+      <section className="mb-20" id="models">
         <div className="mb-12">
           <h2 className="text-4xl font-bold text-foreground mb-3">
             Популярные модели
