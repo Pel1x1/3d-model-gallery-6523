@@ -1,10 +1,10 @@
-// server/routes/models.ts
+// controllers.ts
 
 import { RequestHandler } from "express";
-import { Model } from "../models/model";  // Путь к модели
+import { Model } from "./model"; // Модель из файла model.ts
 import { ModelsResponse, ModelDetailResponse, UploadModelResponse, ModelViewerDataResponse } from "@shared/api";
 
-// Экспортируем функции обработчиков
+// Получение всех моделей
 export const getModels: RequestHandler = async (_req, res) => {
   try {
     const models = await Model.find();
@@ -17,6 +17,7 @@ export const getModels: RequestHandler = async (_req, res) => {
   }
 };
 
+// Получение конкретной модели по ID
 export const getModelById: RequestHandler = async (req, res) => {
   const { id } = req.params;
   try {
@@ -36,6 +37,7 @@ export const getModelById: RequestHandler = async (req, res) => {
   }
 };
 
+// Загрузка новой модели
 export const uploadModel: RequestHandler = async (req, res) => {
   const { title, description, fileUrl, thumbnailUrl, tags } = req.body;
 
@@ -67,6 +69,7 @@ export const uploadModel: RequestHandler = async (req, res) => {
   }
 };
 
+// Получение данных для 3D визуализатора
 export const getModelViewerData: RequestHandler = async (req, res) => {
   const { id } = req.params;
   try {
